@@ -3,111 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        .display {
-            display: flex;
-        }
-        .character {
-            width: 50px;
-            height: 70px;
-            margin: 5px;
-            position: relative;
-            display: grid;
-            grid-template-areas: 
-                "a b c"
-                "d e f"
-                "g g g";
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-        }
-        .segment {
-            width: 100%;
-            height: 100%;
-            background-color: #ccc;
-            opacity: 0.3;
-            position: absolute;
-        }
-        .segment.on {
-            opacity: 1;
-        }
-        .segment.on.a {
-            background-color: #f0f;
-        }
-        .segment.on.b {
-            background-color: #f00;
-        }
-        .segment.on.c {
-            background-color: #f80;
-        }
-        .segment.on.d {
-            background-color: #ff0;
-        }
-        .segment.on.e {
-            background-color: #0f0;
-        }
-        .segment.on.f {
-            background-color: #00f;
-        }
-        .segment.on.g {
-            background-color: #80f;
-        }
-        .a { grid-area: a; }
-        .b { grid-area: b; }
-        .c { grid-area: c; }
-        .d { grid-area: d; }
-        .e { grid-area: e; }
-        .f { grid-area: f; }
-        .g { grid-area: g; }
-    </style>
     <title>Segmented Display</title>
 </head>
 <body>
 
-    <div class="display" id="display">
-        <!-- Characters will be rendered here by JavaScript -->
-    </div>
+<svg id="display" width=100% height=600></svg>
 
-    <script>
-        const segmentMap = {
-            '0': [true, false, false, false, false, false, false],   // Segments a,b,c,e,f,g
-            '1': [false, true, false, false, false, false, false],  // Segments c,f
-            '2': [false, false, true, false, false, false, false],   // Segments a,c,d,e,g
-            '3': [false, false, false, true, false, false, false],   // Segments a,c,d,f,g
-            '4': [false, false, false, false, true, false, false],   // Segments b,c,d,f,g
-            '5': [false, false, false, false, false, true, false],   // Segments a,b,d,f,g
-            '6': [false, false, false, false, false, false, true],    // Segments a,b,d,e,f,g
-        };
+<script>
+    const points = [
+        [5,5],
+        [25,5],
+        [45,5],
+        [5,20],
+        [45,20],
+        [5,25],
+        [25,25],
+        [45,45],
+        [5,30],
+        [45,30],
+        [5,45],
+        [25,45],
+        [45,45],
+        [45,25]
+    ];
 
-        function createCharacter(char) {
-            const character = document.createElement('div');
-            character.classList.add('character');
-            
-            const segments = segmentMap[char];
-            const segmentNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+    const segmentPositions = [
+        [points[5],points[0]],
+        [points[2],points[0]],
+        [points[2],points[12]],
+        [points[12],points[0]],
+        [points[5],points[10]],
+        [points[10],points[11]],
+        [points[11],points[5]],
+        [points[3],points[4]],
+        [points[8],points[9]],
+        [points[5],points[13]],
+        [points[13],points[2]],
+        [points[1],points[6]],
+        [points[5],points[10]],
+        [points[7],points[10]],
+        [points[3],points[4]],
+        [points[1],points[7]],
+        [points[1],points[10]],
+        [points[2],points[5]],
+        [points[7],points[13]],
+        [points[10],points[13]],
+        [points[6],points[11]],
+    ];
 
-            segmentNames.forEach((segment, index) => {
-                const segmentDiv = document.createElement('div');
-                segmentDiv.classList.add('segment', segment);
-                if (segments[index]) {
-                    segmentDiv.classList.add('on');
-                }
-                character.appendChild(segmentDiv);
-            });
+    const digits = {
+        "h":[1,1,1],
+        "w":[1,0,0,1,1,1,1],
+        "y":[0,0,0,0,0,0,0,1,1],
+        "p":[1,1,0,0,1,0,0,0,0,1,1],
+        "b":[1,1,0,0,1,0,0,0,0,1,1,1],
+        "c":[0,0,0,0,0,0,0,0,0,1,1,0,1,1],
+        "j":[0,0,0,0,0,0,0,0,0,1,1,0,1,1,1],
+        "t":[0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1],
+        "d":[0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,1,1],
+        "þ":[0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,1,1,1],
+        "ð":[0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,1,1,1,1,1],
+        "f":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "v":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "k":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "g":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "s":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "z":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "ś":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "ź":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "l":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "m":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "n":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "ŋ":[1,1,1,0,1,0,0,0,0,0,0,0,0,1],
+        "r":[1,1,1,0,1,0,0,0,0,0,0,0,0,1]
+    };
 
-            return character;
+    function drawDigit(svg, digit, offsetX, offsetY) {
+        if (!digits[digit]) return;
+
+        const segments = digits[digit];
+        for (let i = 0; i < segments.length; i++) {
+            if (segments[i]) {
+                const [start, end] = segmentPositions[i];
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", start[0] + offsetX);
+                line.setAttribute("y1", start[1] + offsetY);
+                line.setAttribute("x2", end[0] + offsetX);
+                line.setAttribute("y2", end[1] + offsetY);
+                line.setAttribute("stroke", "black");
+                line.setAttribute("stroke-width", "3");
+                
+                svg.appendChild(line);
+            }
         }
+    }
 
-        function displayCharacters(chars) {
-            const display = document.getElementById('display');
-            display.innerHTML = '';
-            chars.split('').forEach(char => {
-                const character = createCharacter(char);
-                display.appendChild(character);
-            });
-        }
+    function displayNumber(text) {
 
-        // Display "123" as an example
-        displayCharacters('0123456');
-    </script>
+        const diacritics = [
+            ""
+        ];
+
+        const svg = document.getElementById("display");
+        svg.innerHTML = ""; // Clear previous drawings
+
+        let offsetX = 0;
+        let offsetY = 0;
+        const charactersPerLine = 10; // Move to next line after 10 characters
+        const spacingX = 75; // Horizontal space between characters
+        const spacingY = 75; // Vertical space for new lines
+
+        text.split("").forEach((digit, index) => {
+            if (digit in diacritics) { offsetX -= spacingX };
+            drawDigit(svg, digit, offsetX, offsetY);
+
+            // Move to the next character position
+            offsetX += spacingX;
+
+            // If max characters per line is reached, reset X and move Y down
+            if ((index + 1) % charactersPerLine === 0) {
+                offsetX = 0; // Reset to start of the line
+                offsetY += spacingY; // Move down for new row
+            }
+        });
+    }
+
+    displayNumber("fvkgszśźlmnŋr"); // Example usage
+</script>
+
 </body>
 </html>
